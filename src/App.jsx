@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useEffect } from 'react'
 import Header from './components/Header'
 import NavButton from './components/NavButton'
@@ -11,6 +11,8 @@ import './App.css'
 
 /**
  * TO DO
+ * - aria-live and screen reader accessibility
+ * - prefers-reduced-motion
  * - counter error handling
  * - better error handling for file format
  * - exit animations
@@ -238,6 +240,9 @@ function App() {
     setShuffleToastActive(true);
   } 
 
+  /**
+   * Signal the toast element to unmount
+   */
   function dismissToast () {
     setShuffleToastActive(false);
   }
@@ -290,6 +295,42 @@ function App() {
     event.target.value=null; // reset so that same file can be uploaded twice
   }
 
+  /**
+   * Helper function to block arrow keys from advancing card when radio buttons are focused
+   * @returns is either radio button focused
+   */
+  function isToggleFocused() {
+    const focusLeft = document.activeElement === document.getElementById("startTerm");
+    const focusRight = document.activeElement === document.getElementById("startDefinition");
+    return focusLeft || focusRight;
+  }
+
+  /**
+   * Callback that handles what function each arrow key press should do
+   */
+  const handleKeyDown = useCallback((event) => {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      flipCard();
+    }
+    else if (!isToggleFocused() && (event.key === 'ArrowRight' && currentIndex < cardsData.length - 1)) {
+      nextCard();
+    }
+    else if (!isToggleFocused() && (event.key === 'ArrowLeft' && currentIndex > 0)) {
+      prevCard();
+    }
+  }, [currentIndex, cardsData]);
+
+  /**
+   * Effect that listens for keydown change
+   */
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
   return (
     <>
       <Header
@@ -337,13 +378,19 @@ function App() {
       >
         <div className="modal-header">
             <h3>Upload File</h3>
-            <span 
-              className="material-symbols-rounded" 
+            <button 
+              className='iconButton' 
+              aria-label='Close file upload'
               onClick={closeModal} 
-              style={{cursor:"pointer", fontSize:"1.5em"}}
             >
-              close
-            </span>
+              <span 
+                className="material-symbols-rounded" 
+                style={{cursor:"pointer", fontSize:"1.5em"}}
+              >
+                close
+              </span>
+            </button>
+            
         </div>
         <p>Must be a .csv file that is formatted with Term and Definition as the headers. An easy way is to export a spreadsheet that looks like this example:</p>
         <img src={table}></img>
@@ -353,14 +400,15 @@ function App() {
           className='custom-file-input'
         >
           Choose File
+          <input 
+            type="file" 
+            id="file-input" 
+            name="file-input" 
+            accept='.csv' 
+            onChange={uploadFile}
+          ></input>
         </label>
-        <input 
-          type="file" 
-          id="file-input" 
-          name="file-input" 
-          accept='.csv' 
-          onChange={uploadFile}
-        ></input>
+        
       </Modal>
     </>
   )

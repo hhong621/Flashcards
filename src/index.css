@@ -16,6 +16,7 @@
   --stroke-color: #C9C6BC;
   --icon-color: #888165;
   --surface-fill: #F7F3E1;
+  --text-color: #1E1E1E;
   --spring: linear(0, 0.008 1%, 0.032 2%, 0.124 4.2%, 0.649 12.6%, 0.859 16.7%, 0.936 18.7%, 0.998 20.8%, 1.042 22.9%, 1.072 25.1%, 1.091 28.1%, 1.09 31.5%, 1.015 45.7%, 0.993 54.6%, 1);
   --snap-spring: linear(0, 0.031 1.2%, 0.12 2.5%, 0.882 10.4%, 1.02 13.1%, 1.087 16.1%, 1.095 17.6%, 1.091 19.3%, 1.013 27.9%, 0.992 33.8%, 1.001 51.3%, 1);
 }
@@ -29,7 +30,7 @@ body {
   min-height: 100vh;
 }
 
-button {
+.Button {
   border-radius: 24px;
   border: 2px solid var(--stroke-color);
   padding: 0 1.25em 0 1em;
@@ -45,10 +46,10 @@ button {
   align-items: center;
   gap: 6px;
 }
-button:hover {
+.Button:hover {
   background-color: var(--button-fill-hover);
 }
-button:active {
+.Button:active {
   box-shadow: inset 0 4px 8px rgb(0, 0, 0, 0.25);
 }
 
@@ -58,7 +59,8 @@ button:active {
 }
 
 input[type=radio] {
-  display: none;
+  opacity: 0;
+  position: absolute;
 }
 
 .radioLabel {
@@ -81,6 +83,13 @@ input[type=radio] {
 .radioLabel:active {
   box-shadow: inset 0 4px 8px rgb(0, 0, 0, 0.25);
 }
+.radioLabel:has(input[type=radio]:focus) {
+  border: 2px solid var(--text-color) !important;
+}
+.radioLabel:has(input[type=radio]:checked) {
+  border: 2px solid transparent;
+  background-color: #FDCB28;
+}
 
 .toggleSwitch .left {
   border-radius: 24px 0 0 24px;
@@ -88,11 +97,6 @@ input[type=radio] {
 
 .toggleSwitch .right {
   border-radius: 0 24px 24px 0;
-}
-
-input[type=radio]:checked + .radioLabel {
-  border: 2px solid transparent;
-  background-color: #FDCB28;
 }
 
 header {
@@ -115,10 +119,14 @@ header {
   height: 4rem;
   width: 4rem;
   border-radius: 72px;
+  background-color: var(--button-fill-default);
+  cursor: pointer;
   border: none;
   box-shadow: 0 2px 4px rgb(0, 0, 0, 0.25);
   transition: all 0.2s ease-in-out;
   padding: 0;
+  display: flex;
+  align-items: center;
 }
 .nav-button:active {
   box-shadow: inset 0 2px 4px rgb(0, 0, 0, 0.25);
@@ -275,7 +283,8 @@ main {
 }
 
 .modal-content input[type="file"] {
-  display: none;
+  opacity: 0;
+  position: absolute;
 }
 
 .custom-file-input {
@@ -302,6 +311,23 @@ main {
 }
 .custom-file-input:active {
   box-shadow: inset 0 4px 8px rgb(0, 0, 0, 0.25); 
+}
+.custom-file-input:has(input[type="file"]:focus) {
+  border: 2px solid var(--text-color) !important;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border: none;
+}
+.iconButton:focus {
+  border: 1px solid var(--text-color) !important;
 }
 
 @keyframes toastEnter {
